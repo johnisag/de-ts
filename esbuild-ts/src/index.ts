@@ -1,0 +1,1 @@
+document.body.innerHTML = '<h1>Hello, TypeScript with esbuild dude!</h1>';

@@ -1,0 +1,16 @@
+{
+  "name": "esbuild-ts",
+  "version": "1.0.0",
+  "description": "```npm init -y```",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "^0.25.12",
+    "typescript": "^5.9.3"
+  }
+}
