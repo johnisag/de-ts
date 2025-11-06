@@ -22,4 +22,31 @@ bun install
 bun run index.ts
 ```
 
+### install PAPI
+```bash
+bun install polkadot-api
+```
+
+### update package.json
+```json
+{
+  ...,
+  "scripts": {
+    "postinstall": "papi"
+  },
+  ...
+}
+```
+
+### Adding Polkadot chain (meta)
+```bash
+bunx papi add dot -n polkadot
+```
+
+### Adding people and collectives parachains
+```bash
+bunx papi add people -n polkadot_people
+bunx papi add collectives -n polkadot_collectives
+```
+
 This project was created using `bun init` in bun v1.3.1. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
