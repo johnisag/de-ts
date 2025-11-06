@@ -16,6 +16,15 @@ export function makeClient(endpoint: string): PolkadotClient {
     return client;
 }
 
+// Example function to fetch and print chain information
+async function printChainInfo(client: PolkadotClient) {
+    const chainSpec = await client.getChainSpecData();
+    const finalizedBlock = await client.getFinalizedBlock();
+
+    console.log(`Chain Name: ${chainSpec.name}`);
+    console.log(`Finalized Block Number: ${finalizedBlock.number}`);
+}
+
 // Main function to demonstrate client creation
 async function main() {
     // polkadot mainnet endpoint
@@ -24,8 +33,8 @@ async function main() {
     // Create Polkadot client
     const polkadotClient = makeClient(endpoint);
 
-    // Log the client object
-    console.log({ polkadotClient });
+    // Print chain information
+    await printChainInfo(polkadotClient);
 
     console.log("Done");
 
