@@ -1,6 +1,6 @@
-### init angural app
+### init react app
 ```bash
-npm create vite@latest sample-angular-ap
+npm create vite@latest sample-react-app
 ```
 
 ### options
