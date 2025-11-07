@@ -4,8 +4,10 @@ import {
   createClient,
   type PolkadotClient,
   type SS58String,
+  type TypedApi,
 } from "polkadot-api";
-import { dot } from "@polkadot-api/descriptors";
+import { dot, people, type People } from "@polkadot-api/descriptors";
+import type { Type } from "typescript";
 
 // This function creates and returns a PolkadotClient connected to the given endpoint.
 function makeClient(endpoint: string): PolkadotClient {
@@ -61,10 +63,37 @@ async function getBalance(
     return free + reserved;
 }
 
+// Function to get the display name associated with an address from the People descriptor
+async function getDisplayName(
+  peopleClient: PolkadotClient,
+  address: SS58String,
+  is_debug = true,
+): Promise<string | undefined> {
+    // Get the typed API for the People descriptor
+    const peopleApi: TypedApi<People> = peopleClient.getTypedApi(people);
+
+    // Fetch the account information for the given address
+    const accountInfo: any = await peopleApi.query.Identity.IdentityOf.getValue(address);
+
+    // Log the account data for debugging purposes
+    if (is_debug) {
+        console.log(`Identity data for ${address}:`, accountInfo);
+    }
+
+    // Extract the display name
+    const displayName: string | undefined = accountInfo?.info.display.value?.asText();
+
+    // Return the display name
+    return displayName;
+};
+
 // Main execution function
 async function main() {
     // Create a Polkadot client connected to the public Polkadot endpoint
-    const polkadotClient = makeClient("wss://rpc.polkadot.io");
+    const polkadotClient: PolkadotClient = makeClient("wss://rpc.polkadot.io");
+
+    // Create a People client connected to the public People endpoint
+    const peopleClient: PolkadotClient = makeClient("wss://polkadot-people-rpc.polkadot.io");
 
     // Print chain information
     await printChainInfo(polkadotClient);
@@ -73,10 +102,20 @@ async function main() {
     const address: SS58String = "15DCZocYEM2ThYCAj22QE4QENRvUNVrDtoLBVbCm5x4EQncr";
     
     // Call `getBalance` and await the result
-    const balance = await getBalance(polkadotClient, address);
+    const balance: BigInt = await getBalance(polkadotClient, address);
     
     // Print a friendly message with the address and balance
     console.log(`The balance of address ${address} is ${balance} Plancks.`);
+
+    // Call `getDisplayName` and await the result 
+    const displayName: string | undefined = await getDisplayName(peopleClient, address);
+
+    // Print the display name if it exists
+    if (displayName) {
+      console.log(`The display name for address ${address} is ${displayName}.`);
+    } else {
+      console.log(`No display name found for address ${address}.`);
+    }
 
     console.log(`Done!`);
     
