@@ -6,8 +6,8 @@ import {
   type SS58String,
   type TypedApi,
 } from "polkadot-api";
-import { dot, people, type People } from "@polkadot-api/descriptors";
-import type { Type } from "typescript";
+import { dot, people, type People, collectives} from "@polkadot-api/descriptors";
+import { add } from '../esmodule-ts/src/math';
 
 // This function creates and returns a PolkadotClient connected to the given endpoint.
 function makeClient(endpoint: string): PolkadotClient {
@@ -87,6 +87,32 @@ async function getDisplayName(
     return displayName;
 };
 
+
+interface FellowshipMember {
+    address: SS58String;
+    rank: number;
+}
+
+// Function to get fellowship members from the Collectives descriptor
+async function getFellowshipMembers(
+  collectivesClient: PolkadotClient,
+): Promise<FellowshipMember[]> {
+    // Get the typed API for the Collectives descriptor
+    const collectivesApi = collectivesClient.getTypedApi(collectives);
+
+    // Fetch the fellowship members entries
+    const rawMembers = await collectivesApi.query.FellowshipCollective.Members.getEntries();
+    
+    // Map the raw members to the FellowshipMember structure
+    const fellowshipMembers: FellowshipMember[] = rawMembers.map((m) => ({
+        address: m.keyArgs[0],
+        rank: m.value
+    }));
+
+    // Return the fellowship members
+    return fellowshipMembers;
+}
+
 // Main execution function
 async function main() {
     // Create a Polkadot client connected to the public Polkadot endpoint
@@ -94,6 +120,9 @@ async function main() {
 
     // Create a People client connected to the public People endpoint
     const peopleClient: PolkadotClient = makeClient("wss://polkadot-people-rpc.polkadot.io");
+
+    // Create a Collectives client connected to the public Collectives endpoint
+    const collectivesClient: PolkadotClient = makeClient("wss://polkadot-collectives-rpc.polkadot.io");
 
     // Print chain information
     await printChainInfo(polkadotClient);
@@ -117,7 +146,31 @@ async function main() {
       console.log(`No display name found for address ${address}.`);
     }
 
-    console.log(`Done!`);
+    // Get fellowship members
+    const members: FellowshipMember[] = await getFellowshipMembers(collectivesClient);
+
+    console.log("Generating fellowship members table:");
+    const table = [];
+
+    for (const {address, rank} of members) {
+        // Get balance for each member
+        const fbalance: BigInt = await getBalance(polkadotClient, address, false);
+        
+        // Get display name for each member
+        const name: string | undefined = await getDisplayName(peopleClient, address, false);
+        
+        // Print member details
+        console.log(`- Rank ${rank}: ${address} (${name ?? "No name"}) with balance ${fbalance} Plancks`);
+
+        // Add member details to the table
+        table.push({ Rank: rank, Address: address, Name: name });
+    }
+
+    // Sort the table by Rank
+    table.sort((a, b) => b.Rank - a.Rank);
+    
+    // Print the table
+    console.table(table);
     
     process.exit(0);
 }
