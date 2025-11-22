@@ -1,0 +1,63 @@
+{
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig.json to read more about this file */
+
+    // ────── Project basics ──────
+    "target": "ES2022",                  // Node.js 20+ supports this natively
+    "lib": ["ES2023"],                   // Full modern JS features
+    "module": "Node16",                  // Best for Node.js 16+ (correctly handles .js ↔ .ts extensions)
+    "moduleResolution": "Node16",         // Required when using "Node16" or "NodeNext"
+
+    // ────── Strictness (highly recommended) ──────
+    "strict": true,                      // Enables all strict type-checking options
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "noImplicitThis": true,
+    "useUnknownInCatchVariables": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // ────── Output & source maps ──────
+    "sourceMap": true,
+    "outDir": "./dist",                  // Only needed if you ever run `tsc` to build
+    "removeComments": true,
+
+    // ────── Modern goodies ──────
+    "resolveJsonModule": true,           // Allow importing .json files
+    "allowSyntheticDefaultImports": true, // Nice import syntax even if no default export
+    "esModuleInterop": true,             // Proper interop with CommonJS (e.g. import duckdb from "duckdb")
+    "forceConsistentCasingInFileNames": true,
+
+    // ────── Nice for development with tsx / ts-node ──────
+    "skipLibCheck": true,                // Speeds up compilation, safe in 99% of cases
+    "noEmit": true,                      // We let tsx handle execution; tsc is only for type-checking
+
+    // ────── Paths & includes ──────
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["src/*"]
+    }
+  },
+
+  "include": [
+    "src/**/*",
+    "*.ts"                     // if you have scripts at root (like this DuckDB example)
+  ],
+
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+
+  "ts-node": {
+    "transpileOnly": true,     // Huge speed boost when using tsx / ts-node
+    "esm": false
+  }
+}
